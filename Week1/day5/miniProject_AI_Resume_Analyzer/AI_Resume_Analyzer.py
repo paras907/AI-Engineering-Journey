@@ -23,7 +23,7 @@ model = "llama-3.3-70b-versatile"
 def read_pdf(file_name):
     # if file is not in pdf format.
     if not file_name.lower().endswith(".pdf"):
-        print("Enter pdf file")
+        raise ValueError("Please provide a PDF file")
         return
 
     complete_text = ""
@@ -32,7 +32,7 @@ def read_pdf(file_name):
         with open(file_name, "rb") as file:
             reader = pypdf.PdfReader(file)
 
-            print("Successfully read")
+            print("Successfully read the data.")
 
             for page in reader.pages:
                 text = page.extract_text()
@@ -46,12 +46,12 @@ def read_pdf(file_name):
     return complete_text
 
 
-user_input = input("Enter the resume in (.pdf) format.")
-user_resume = read_pdf(user_input)
+user_input = input("Enter the resume in (.pdf) format: ")
+user_data = read_pdf(user_input)
 
 
-job_des = input("Enter the job description in (.pdf) format.")
-complete_job_des = read_pdf(job_des)
+job_des_input = input("Enter the job description in (.pdf) format: ")
+job_des_data = read_pdf(job_des_input)
 
 
 
@@ -100,8 +100,35 @@ def extract_resume(user_resume):
 
 def match_both(jd, res):
     system_prompt = """
-        You are a professional HR assistant. Your work is to caompare the job description with candidate's resume.
-        And generate the score between 1 to 100 from it to ensures that the candidate is how much fit for the given role.
+        You are an ATS (Applicant Tracking System) analyzing a resume against a job description.
+
+        Your task:
+        Compare ONLY the information explicitly present in the resume and job description.
+
+        Rules:
+        - Do not assume skills or experience that are not mentioned.
+        - If something is not present in the resume, mark it as "Not Found".
+        - Separate missing skills from skills that are present but do not fully meet requirements.
+        - Keep the analysis concise and professional.
+
+        Return the response in this format:
+
+        Overall Match Score: XX/100
+
+        Matching Skills:
+        - Skill name: candidate evidence
+
+        Missing Skills:
+        - Required skill: Not Found
+
+        Experience Alignment:
+        - Brief comparison between candidate experience and job requirements.
+
+        Strengths:
+        - ...
+
+        Gaps:
+        - ...
         """
     user_prompt = f"""
         your work is to generate the score on the basis of job description and the resume data given .
@@ -112,7 +139,7 @@ def match_both(jd, res):
 
 
 
-resume_data = extract_resume(user_resume)
-job_data = extract_job_des(complete_job_des)
+resume_data = extract_resume(user_data)
+job_data = extract_job_des(job_des_data)
 score = match_both(job_data, resume_data)
 print(score)
