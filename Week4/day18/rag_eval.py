@@ -47,7 +47,7 @@ try:
         url=QDRANT_URL,
         api_key=QDRANT_API_KEY
         timeout=60,
-        check_compatibility=False
+        git statuscheck_compatibility=False
     )
 
     client.get_collections()
